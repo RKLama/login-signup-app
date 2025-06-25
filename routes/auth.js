@@ -46,12 +46,23 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET dashboard
-router.get('/dashboard', (req, res) => {
+// Route Protection Middleware
+function requireAuth(req, res, next) {
   if (!req.session.userId) {
     return res.redirect('/login');
   }
-  res.render('dashboard');
+  next();
+}
+
+// GET dashboard
+router.get('/dashboard', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM users WHERE id = $1', [req.session.userId]);
+    const user = result.rows[0];
+    res.render('dashboard', { user });
+  } catch (err) {
+    res.send('Error: ' + err.message);
+  }
 });
 
 // GET logout
