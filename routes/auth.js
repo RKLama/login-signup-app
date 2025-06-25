@@ -54,4 +54,14 @@ router.get('/dashboard', (req, res) => {
   res.render('dashboard');
 });
 
+// GET logout
+router.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.send('Error logging out');
+    }
+    res.redirect('/login');
+  });
+});
+
 module.exports = router;
